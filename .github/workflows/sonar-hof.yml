@@ -44,16 +44,7 @@ jobs:
         run: |
           count=0
           if [ -s bw-output/compile_commands.json ]; then
-            count=$(python3 - <<'PY'
-import json
-try:
-    with open("bw-output/compile_commands.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    print(len(data) if isinstance(data, list) else 0)
-except Exception:
-    print(0)
-PY
-)
+            count=$(python3 -c 'import json; import sys; data=json.load(open("bw-output/compile_commands.json", encoding="utf-8")); print(len(data) if isinstance(data, list) else 0)' 2>/dev/null || echo 0)
           fi
           echo "compile_commands_count=$count"
           if [ "$count" -gt 0 ]; then
