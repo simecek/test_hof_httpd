@@ -28,7 +28,11 @@ jobs:
           if [ -x ./buildconf ]; then
             ./buildconf
           fi
-          ./configure --disable-shared --enable-static
+          ./configure \
+            --with-apr=/usr/bin/apr-1-config \
+            --with-apr-util=/usr/bin/apu-1-config \
+            --disable-shared \
+            --enable-static
 
       - name: Build with Sonar build-wrapper
         id: build
@@ -38,7 +42,21 @@ jobs:
       - name: Check compilation database
         id: bw
         run: |
+          count=0
           if [ -s bw-output/compile_commands.json ]; then
+            count=$(python3 - <<'PY'
+import json
+try:
+    with open("bw-output/compile_commands.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+    print(len(data) if isinstance(data, list) else 0)
+except Exception:
+    print(0)
+PY
+)
+          fi
+          echo "compile_commands_count=$count"
+          if [ "$count" -gt 0 ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
