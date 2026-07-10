@@ -32,7 +32,6 @@ jobs:
 
       - name: Build with Sonar build-wrapper
         id: build
-        if: steps.configure.outcome == 'success'
         continue-on-error: true
         run: ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make -j2
 
